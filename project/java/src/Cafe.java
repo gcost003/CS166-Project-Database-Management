@@ -436,7 +436,7 @@ public class Cafe {
             esql.executeQueryAndPrintResult(query);  
          }
 
-         String query = String.format("---Placing an Order---");
+         System.out.println("---Placing an Order---");
          System.out.println("=============================")
          System.out.println("Do you want to Add a Order? (Yes/No)");
          String edit = in.readLine();
@@ -453,9 +453,8 @@ public class Cafe {
             }
              Timestamp curtime=NOW();
              boolean isPaid= false;
-            String query = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%s','%s','%s','%s','%f')",It,authorisedUser,isPaid,curtime,total);
-            esql.executeQueryAndPrintResult(query); //timeStampRecieved=NOW() to get the current timestamp
-            //in sql to make sure that the order is not paid then make sure: paid='false'
+            String NewOrder = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%s','%s','%s','%s','%f')",It,authorisedUser,isPaid,curtime,total);
+            esql.executeQueryAndPrintResult(NewOrder); 
       }
       
   }
