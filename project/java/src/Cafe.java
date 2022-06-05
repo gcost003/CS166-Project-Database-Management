@@ -275,8 +275,8 @@ public class Cafe {
                 System.out.println("9. Log out");
                 switch (readChoice()){
                    case 1: Menu(esql); break;
-                   case 2: UpdateProfile(esql); break;
-                   case 3: PlaceOrder(esql); break;
+                   case 2: UpdateProfile(esql, authoriedUser); break;
+                   case 3: PlaceOrder(esql, authoriedUser); break;
                    case 4: UpdateOrder(esql); break;
                    case 9: usermenu = false; break;
                    //===================================
@@ -418,12 +418,52 @@ public class Cafe {
          }
       }
   }
-  public static void PlaceOrder(Cafe esql){
+ /* first show the previous orders(5 most recent for customers) or orders from the past 24 hours for the managers and employees), then 
+    place new order */
+  public static void PlaceOrder(Cafe esql, String authorisedUser){  //this is basically adding your order
+      try{
+         //System.out.print("\t Are you a customer? If so, provide your login");
+         //String check = in.readLine();
+         String check = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Customer'", authorisedUser);
+         esql.executeQueryAndPrintResult(query); //checking if it prints out results
+         if(check.isEmpty()){
+            String query = String.format("SELECT * FROM Orders WHERE timeStampReceived > DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+            //or you can do this for String query = String.format("SELECT * FROM Orders WHERE timeStampReceived > (NOW() - INTERVAL 24 HOUR)");
+            esql.executeQueryAndPrintResult(query);
+         }
+         else{
+            String query = String.format("SELECT * FROM (SELECT TOP 5 * FROM Orders ORDER BY orderid) WHERE login = '%s' ORDER BY orderid ", authoriedUser);
+            esql.executeQueryAndPrintResult(query);  
+         }
 
+         String query = String.format("---Placing an Order---");
+         System.out.println("=============================")
+         System.out.println("Do you want to Add a Order? (Yes/No)");
+         String edit = in.readLine();
+         if("Yes".equalsIgnoreCase(edit)){
+            System.out.println("---Adding item---");
+            System.out.println("How many items you want to order?");
+            int orderitems = in.readLine();
+            float total=0;
+            for(int i=0;i<orderitems;i++){
+               System.out.println("Enter itemName:");
+               String item=in.readLine();
+               float cur=String.format("SELECT price FROM Menu WHERE itemName='%s'",item);
+               total+=cur;
+            }
+             Timestamp curtime=NOW();
+             boolean isPaid= false;
+            String query = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%s','%s','%s','%s','%f')",It,authorisedUser,isPaid,curtime,total);
+            esql.executeQueryAndPrintResult(query); //timeStampRecieved=NOW() to get the current timestamp
+            //in sql to make sure that the order is not paid then make sure: paid='false'
+      }
+      
   }
 
-  public static void UpdateOrder(Cafe esql){
-      
+
+
+  public static void UpdateOrder(Cafe esql){  
+
   }
 
   public static void ChangePassword(Cafe esql, String authorisedUser){
@@ -475,7 +515,7 @@ public class Cafe {
   /* Made sure that the authorisedUser is a manager then asked customer login in order to be able 
      to change the customer to employe or manager */
   public static void ChangeType(Cafe esql, String authorisedUser){
-   String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Manager", authoriedUser);
+   String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Manager", authorisedUser);
    if(query.isEmpty()){
       System.out.println("You are not a manager So you are not able to change the types of autorization.");
    }
@@ -535,12 +575,12 @@ public class Cafe {
   public static void UpdateMenu(Cafe esql){
      System.out.print("\t Are you a manager? If so, provide your login");
      String check = in.readLine();
-     String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Manager", check);
+     String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Manager'", check);
      if(query.isEmpty()){
         System.out.println("You are not a manager.");
      }
      else{
-        System.out.println("Do you want to Add, Delete or Update an item?");
+        System.out.println("Do you want to \"Add\", \"Delete\" or \"Update\" an item?");
         String edit = in.readLine();
         if("Add".equalsIgnoreCase(edit)){
          System.out.println("---Adding item---");
@@ -556,7 +596,7 @@ public class Cafe {
            String URL = in.readLine();
 
            String query = String.format("INSERT INTO MENU (itemName,type,price,description,imageURL) VALUES('%s','%s','%f','%s','%s')",ItemName,Type,Price,Description,URL);
-           esql.executeQuery(query);
+           esql.executeQueryAndPrintResult(query);
 
         }
         else if("Delete".equalsIgnoreCase(edit)){
