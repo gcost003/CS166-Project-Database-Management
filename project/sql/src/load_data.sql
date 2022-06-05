@@ -15,3 +15,7 @@ COPY ITEMSTATUS
 FROM 'itemStatus.csv'
 WITH DELIMITER ';';
 
+COPY USER_LIST
+FROM '/home/user/project/data/usr_list.csv'
+WITH DELIMITER ';';
+
