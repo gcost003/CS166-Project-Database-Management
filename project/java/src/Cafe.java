@@ -437,7 +437,7 @@ public class Cafe {
          }
 
          System.out.println("---Placing an Order---");
-         System.out.println("=============================")
+         System.out.println("=============================");
          System.out.println("Do you want to Add a Order? (Yes/No)");
          String edit = in.readLine();
          if("Yes".equalsIgnoreCase(edit)){
@@ -453,7 +453,8 @@ public class Cafe {
             }
              Timestamp curtime=NOW();
              boolean isPaid= false;
-            String NewOrder = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%s','%s','%s','%s','%f')",It,authorisedUser,isPaid,curtime,total);
+             Serial Orderid= name; //??????????
+            String NewOrder = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%f','%s','%s','%s','%f')",Orderid,authorisedUser,isPaid,curtime,total);
             esql.executeQueryAndPrintResult(NewOrder); 
       }
       
@@ -461,8 +462,22 @@ public class Cafe {
 
 
 
-  public static void UpdateOrder(Cafe esql){  
-
+  public static void UpdateOrder(Cafe esql, String authorisedUser){  
+     try{
+         System.out.println("---Updating Order---");
+         System.out.println("=====================================");
+         String check=String.format("SELECT type from Users WHERE login = '%s' AND type='Customer'",authorisedUser);
+         if(check.isEmpty()){
+            System.out.println("Enter the Order ID you want to update:");
+            Serial orderid=in.readLine();
+            boolean paidstatus=true;
+            String query=String.format("UPDATE Orders SET paid='%s' WHERE orderid='%f'",paidstatus,orderid);
+            esql.executeQueryAndPrintResult(query);
+         }
+     }
+     catch(Exception e){
+      System.err.println (e.getMessage ());
+   }
   }
 
   public static void ChangePassword(Cafe esql, String authorisedUser){
@@ -529,7 +544,7 @@ public class Cafe {
          String choice = in.readLine();
          //String option1 = "1";  we can use option1 for the if statement like--> if(option1.equals(choice)){} just in case the other dont works
          if("1".equals(choice)){
-            System.out.println("Enter the User login of the Customer that you want to update there type:")
+            System.out.println("Enter the User login of the Customer that you want to update there type:");
             String login = in.readLine();
 
             String query = String.format("UPDATE Users SET type = 'Employee' WHERE login = '%s'", login);
@@ -538,7 +553,7 @@ public class Cafe {
          }
          //String option2 = "2";  we can use option2 for the if statement like--> if(option2.equals(choice)){} just in case 
          else if("2".equals(choice)){
-            System.out.println("Enter the User login of the Customer that you want to update there type:")
+            System.out.println("Enter the User login of the Customer that you want to update there type:");
             String login = in.readLine();
 
             String query = String.format("UPDATE Users SET type = 'Manager' WHERE login = '%s'", login);
