@@ -111,13 +111,13 @@ public class Cafe {
       // iterates through the result set and output them to standard out.
       boolean outputHeader = true;
       while (rs.next()){
-	 if(outputHeader){
-	    for(int i = 1; i <= numCol; i++){
-		System.out.print(rsmd.getColumnName(i) + "\t");
-	    }
-	    System.out.println();
-	    outputHeader = false;
-	 }
+		 if(outputHeader){
+			for(int i = 1; i <= numCol; i++){
+			System.out.print(rsmd.getColumnName(i) + "\t");
+			}
+			System.out.println();
+			outputHeader = false;
+		 }
          for (int i=1; i<=numCol; ++i)
             System.out.print (rs.getString (i) + "\t");
          System.out.println ();
@@ -155,10 +155,10 @@ public class Cafe {
       boolean outputHeader = false;
       List<List<String>> result  = new ArrayList<List<String>>();
       while (rs.next()){
-          List<String> record = new ArrayList<String>();
-         for (int i=1; i<=numCol; ++i)
-            record.add(rs.getString (i));
-         result.add(record);
+        List<String> record = new ArrayList<String>();
+		for (int i=1; i<=numCol; ++i)
+			record.add(rs.getString (i));
+        result.add(record);
       }//end while
       stmt.close ();
       return result;
@@ -182,7 +182,7 @@ public class Cafe {
        int rowCount = 0;
 
        // iterates through the result set and count nuber of results.
-       if(rs.next()){
+       while (rs.next()){
           rowCount++;
        }//end while
        stmt.close ();
@@ -279,8 +279,6 @@ public class Cafe {
                    case 3: PlaceOrder(esql, authoriedUser); break;
                    case 4: UpdateOrder(esql); break;
                    case 9: usermenu = false; break;
-                   //===================================
-                   case 
                    default : System.out.println("Unrecognized choice!"); break;
                 }
               }
@@ -376,9 +374,9 @@ public class Cafe {
       }
    }//end
 
-// Rest of the functions definition go in here
+ // Rest of the functions definition go in here
 
-/*I am not to sure is I need to put "sting authorisedUser" in the void function too  */
+ /*I am not to sure is I need to put "sting authorisedUser" in the void function too  */
   public static void Menu(Cafe esql){
       System.out.println("Cafe Menu");
       /*Trying to display all item names and prices from menu */
@@ -420,11 +418,11 @@ public class Cafe {
   }
  /* first show the previous orders(5 most recent for customers) or orders from the past 24 hours for the managers and employees), then 
     place new order */
-  public static void PlaceOrder(Cafe esql, String authorisedUser){  //this is basically adding your order
+  public static void PlaceOrder(Cafe esql, String authorisedUser, String orderid){  //this is basically adding your order
       try{
          //System.out.print("\t Are you a customer? If so, provide your login");
          //String check = in.readLine();
-         String check = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Customer'", authorisedUser);
+         String check = String.format("SELECT type FROM USER WHERE login ='%s' AND type LIKE '%Customer%'", authorisedUser);
          esql.executeQueryAndPrintResult(query); //checking if it prints out results
          if(check.isEmpty()){
             String query = String.format("SELECT * FROM Orders WHERE timeStampReceived > DATE_SUB(NOW(), INTERVAL 24 HOUR)");
@@ -451,14 +449,14 @@ public class Cafe {
                float cur=String.format("SELECT price FROM Menu WHERE itemName='%s'",item);
                total+=cur;
             }
-             Timestamp curtime=NOW();
+             Timestamp curtime=NOW(); //if this does not work then we can use the trigger
              boolean isPaid= false;
-             Serial Orderid= name; //??????????
-            String NewOrder = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%f','%s','%s','%s','%f')",Orderid,authorisedUser,isPaid,curtime,total);
+             //Serial Orderid= name; //??????????
+            String NewOrder = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%f','%s','%s','%s','%f')",orderid,authorisedUser,isPaid,curtime,total);  //we might not need orderid sense it generates automaticlly 
             esql.executeQueryAndPrintResult(NewOrder); 
+         }   
       }
-      
-  }
+   }
 
 
 
@@ -466,7 +464,7 @@ public class Cafe {
      try{
          System.out.println("---Updating Order---");
          System.out.println("=====================================");
-         String check=String.format("SELECT type from Users WHERE login = '%s' AND type='Customer'",authorisedUser);
+         String check=String.format("SELECT type from Users WHERE login = '%s' AND type='%Customer%'",authorisedUser);
          if(check.isEmpty()){
             System.out.println("Enter the Order ID you want to update:");
             Serial orderid=in.readLine();
@@ -529,7 +527,7 @@ public class Cafe {
   /* Made sure that the authorisedUser is a manager then asked customer login in order to be able 
      to change the customer to employe or manager */
   public static void ChangeType(Cafe esql, String authorisedUser){
-   String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Manager", authorisedUser);
+   String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type LIKE '%Manager%", authorisedUser);
    if(query.isEmpty()){
       System.out.println("You are not a manager So you are not able to change the types of autorization.");
    }
@@ -579,7 +577,7 @@ public class Cafe {
         System.out.println("\tEnter The Item Type of what you are searching: ");
         String itemType = in.readLine();
       }
-      String query = String.format("SELECT M.itemName, M.price FROM MENU M WHERE M.itemName = '%s' AND M.type '%s'", item_name, itemType);
+      String query = String.format("SELECT M.itemName, M.price FROM MENU M WHERE M.itemName = '%s' AND M.type = '%s'", item_name, itemType);
       esql.executeQueryAndPrintResult(query);
      }catch(Exception e){
      System.err.println (e.getMessage ());
@@ -589,7 +587,7 @@ public class Cafe {
   public static void UpdateMenu(Cafe esql){
      System.out.print("\t Are you a manager? If so, provide your login");
      String check = in.readLine();
-     String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type = 'Manager'", check);
+     String query = String.format("SELECT type FROM USER WHERE login ='%s' AND type LIKE '%Manager%'", check);
      if(query.isEmpty()){
         System.out.println("You are not a manager.");
      }
