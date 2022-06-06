@@ -441,7 +441,7 @@ public class Cafe {
          System.out.println("Do you want to Add a Order? (Yes/No)");
          String edit = in.readLine();
          if("Yes".equalsIgnoreCase(edit)){
-            System.out.println("---Adding item---");
+            System.out.println("---Adding Order---");
             System.out.println("How many items you want to order?");
             int orderitems = in.readLine();
             float total=0;
