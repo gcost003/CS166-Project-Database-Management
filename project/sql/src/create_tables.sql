@@ -35,4 +35,4 @@ CREATE TABLE ItemStatus(
 	comments char(130), 
 	PRIMARY KEY(orderid,itemName),
 	FOREIGN KEY(orderid) REFERENCES Orders(orderid),
-	FOREIGN KEY(itemName) REFERENCES Menu(itemName));
+	FOREIGN KEY(itemName) REFERENCES Menu(itemName) ON DELETE CASCADE);
