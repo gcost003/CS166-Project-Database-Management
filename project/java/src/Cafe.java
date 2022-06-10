@@ -421,6 +421,21 @@ public class Cafe {
   /*Made a list of commands for the user to update his/her profile */    
   public static void UpdateProfile(Cafe esql, String authorisedUser){
       try{
+         boolean ProfileInfo = true;
+         while(ProfileInfo == true){
+            System.out.println("Do you want to see your Profile Information? 'Yes' or 'No'");
+            String seeProfile = in.readLine();
+            if("Yes".equalsIgnoreCase(seeProfile)){
+               String displayProfile=String.format("SELECT * FROM Users WHERE login='%s'",authorisedUser);
+               esql.executeQueryAndPrintResult(displayProfile);
+            }
+            else if("No".equalsIgnoreCase(seeProfile)){
+               ProfileInfo=false;
+            }
+            else{
+               System.out.println("Invalid Input! Try again!");
+            }
+         }
          boolean profile = true;
          while(profile){
             System.out.println("---Updating Profile---");
@@ -451,12 +466,12 @@ public class Cafe {
       try{
          String check = String.format("SELECT * FROM Users WHERE login ='%s' AND type = 'Customer'", authorisedUser);
          if(esql.executeQueryAndReturnResult(check).isEmpty()){
-            String query = String.format("SELECT * FROM Orders WHERE (timeStampRecieved=NOW())< 86400");
+            String query = String.format("SELECT * FROM Orders WHERE timeStampRecieved>= NOW()-INTERVAL '1 DAY'");
             //or you can do this for String query = String.format("SELECT * FROM Orders WHERE timeStampReceived > (NOW() - INTERVAL 24 HOUR)");
             esql.executeQueryAndPrintResult(query);
          }
          else{
-            String check = String.format("Showing the previous orders (5 most recent) for Customers.");
+            System.out.println("Showing the previous orders (5 most recent) for Customers.");
             String query = String.format("SELECT * FROM Orders WHERE orderid>=(orderid-5) AND login = '%s'", authorisedUser);
             //"SELECT * FROM Orders WHERE orderid>=(orderid-5)"
             esql.executeQueryAndPrintResult(query);  
@@ -477,11 +492,14 @@ public class Cafe {
                System.out.println("If you are Tipping, then Enter the Price amount with Tip: ");
                System.out.println("If not, Enter the Price of the item: ");
                String tipWithPrice = in.readLine();
+                  if(tipWithPrice.isEmpty()){
+                     System.out.println("Sorry! Please enter the correct amount.");
+                  }
                Float total = Float.parseFloat(tipWithPrice);
                Long datetime = System.currentTimeMillis();
                Timestamp curtime = new Timestamp(datetime); 
                boolean isPaid= false;
-               String NewOrder = String.format("INSERT INTO Orders (orderid,login,paid,timeStampRecieved,total) VALUES('%s','%s','%s','%f')",orderid,authorisedUser,isPaid,curtime,total);  //we might not need orderid sense it generates automaticlly 
+               String NewOrder = String.format("INSERT INTO Orders (login,paid,timeStampRecieved,total) VALUES('%s','%s','%s','%f')",authorisedUser,isPaid,curtime,total);  //we might not need orderid sense it generates automaticlly 
                esql.executeUpdate(NewOrder); 
                String NewOrderID = String.format("SELECT * FROM Orders WHERE login='%s'",authorisedUser);
                esql.executeQueryAndPrintResult(NewOrderID);

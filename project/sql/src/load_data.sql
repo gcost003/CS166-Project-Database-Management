@@ -1,3 +1,4 @@
+/* we change the path to data files where is the absolute paths to avoid ambiguity */
 COPY MENU
 FROM '/extra/gcost003/CS166-Project-main/project/data/menu.csv'
 WITH DELIMITER ';';
